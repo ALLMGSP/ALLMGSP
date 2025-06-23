@@ -19,6 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
         showTab('home');
     }
 
+    // --- LÓGICA DO MENU MOBILE ---
+    const menuToggle = document.querySelector('.header__menu-toggle');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            document.body.classList.toggle('nav-open');
+        });
+    }
+
+    // Função para fechar o menu ao clicar em um link (usada no HTML)
+    window.closeMobileMenu = function() {
+        document.body.classList.remove('nav-open');
+    }
+
+
     // --- Lógica do Carrossel Principal ---
     const carouselSection = document.querySelector('.carousel-section-lateral');
     if (carouselSection) {
@@ -65,37 +79,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = document.querySelector('.clients-carousel-btn.prev');
         const nextBtn = document.querySelector('.clients-carousel-btn.next');
         const partnerItems = partnerCarousel.querySelectorAll('.client-item');
-        const itemWidth = partnerItems[0].offsetWidth + 40;
-        let currentPartnerIndex = 0;
+        if (partnerItems.length > 0) {
+            const itemWidth = partnerItems[0].offsetWidth + 40;
+            let currentPartnerIndex = 0;
 
-        function updatePartnerCarouselPosition() {
-            partnerCarousel.style.transform = `translateX(${-currentPartnerIndex * itemWidth}px)`;
-        }
-
-        nextBtn.addEventListener('click', () => {
-            const itemsInView = Math.floor(partnerCarousel.parentElement.offsetWidth / itemWidth);
-            const maxIndex = partnerItems.length - itemsInView;
-            if (currentPartnerIndex < maxIndex) {
-                currentPartnerIndex++;
-                updatePartnerCarouselPosition();
+            function updatePartnerCarouselPosition() {
+                partnerCarousel.style.transform = `translateX(${-currentPartnerIndex * itemWidth}px)`;
             }
-        });
 
-        prevBtn.addEventListener('click', () => {
-            if (currentPartnerIndex > 0) {
-                currentPartnerIndex--;
-                updatePartnerCarouselPosition();
-            }
-        });
-        
-        partnerItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const name = item.dataset.name;
-                const info = item.dataset.info;
-                const imgSrc = item.querySelector('img').src;
-                showPartnerInfo(name, info, imgSrc);
+            nextBtn.addEventListener('click', () => {
+                const itemsInView = Math.floor(partnerCarousel.parentElement.offsetWidth / itemWidth);
+                const maxIndex = partnerItems.length - itemsInView;
+                if (currentPartnerIndex < maxIndex) {
+                    currentPartnerIndex++;
+                    updatePartnerCarouselPosition();
+                }
             });
-        });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentPartnerIndex > 0) {
+                    currentPartnerIndex--;
+                    updatePartnerCarouselPosition();
+                }
+            });
+            
+            partnerItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const name = item.dataset.name;
+                    const info = item.dataset.info;
+                    const imgSrc = item.querySelector('img').src;
+                    showPartnerInfo(name, info, imgSrc);
+                });
+            });
+        }
     }
 
     // --- Lógica dos Modais (Visualizadores de Imagem e Atleta) ---
