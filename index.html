@@ -14,14 +14,20 @@
             <img src="https://i.imgur.com/tcjsdMw.png" alt="Logo All Management Sports">
             <span>All Management Sports</span>
         </a>
+        
+        <button class="header__menu-toggle" aria-label="Abrir menu">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-times"></i>
+        </button>
+
         <nav class="header__nav">
             <ul>
-                <li><a onclick="showTab('sobre')">Sobre</a></li>
-                <li><a onclick="showTab('expertise')">Expertise</a></li>
-                <li><a onclick="showTab('equipe')">Equipe</a></li>
-                <li><a onclick="showTab('nossos-produtos')">Nossos Produtos</a></li>
-                <li><a onclick="showTab('nossos-atletas')">Nossos Atletas</a></li>
-                <li><a onclick="showTab('contato')">Contato</a></li>
+                <li><a onclick="closeMobileMenu(); showTab('sobre');">Sobre</a></li>
+                <li><a onclick="closeMobileMenu(); showTab('expertise');">Expertise</a></li>
+                <li><a onclick="closeMobileMenu(); showTab('equipe');">Equipe</a></li>
+                <li><a onclick="closeMobileMenu(); showTab('nossos-produtos');">Nossos Produtos</a></li>
+                <li><a onclick="closeMobileMenu(); showTab('nossos-atletas');">Nossos Atletas</a></li>
+                <li><a onclick="closeMobileMenu(); showTab('contato');">Contato</a></li>
             </ul>
         </nav>
     </header>
@@ -702,6 +708,7 @@
                     <p>Estamos ansiosos para conectar com você e explorar como a All Management Sports pode ser sua parceira estratégica no mundo do futebol!</p>
                 </div>
                 <div class="contact-cards-grid">
+                    <a href="mailto:allmanagementsports@gmail.com" target="_blank"><img src="https://i.imgur.com/wsJphIh.png" alt="Contato Arthur"></a>
                     <a href="mailto:allmanagementsports@gmail.com" target="_blank"><img src="https://i.imgur.com/O0vtUHl.png" alt="Contato Felipe"></a>
                     <a href="mailto:allmanagementsports@gmail.com" target="_blank"><img src="https://i.imgur.com/V3ncPXm.png" alt="Contato Sheldon"></a>
                     <a href="mailto:allmanagementsports@gmail.com" target="_blank"><img src="https://i.imgur.com/O6eX4tk.png" alt="Contato Luisa"></a>
