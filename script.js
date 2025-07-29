@@ -1,327 +1,283 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-    // Função para alternar entre as abas principais
-    window.showTab = function(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        const newTab = document.getElementById(tabId);
-        if (newTab) {
-            newTab.classList.add('active');
-        } else if (tabId === 'home') { // Fallback para o logo
-             document.getElementById('home').classList.add('active');
-        }
-        window.scrollTo(0, 0);
-    }
-    
-    // Inicializa a aba 'home' se nenhuma estiver ativa
-    if (!document.querySelector('.tab-content.active')) {
-        showTab('home');
-    }
-
-    // --- LÓGICA DO MENU MOBILE ---
-    const menuToggle = document.querySelector('.header__menu-toggle');
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            document.body.classList.toggle('nav-open');
-        });
-    }
-
-    // Função para fechar o menu ao clicar em um link (usada no HTML)
-    window.closeMobileMenu = function() {
-        document.body.classList.remove('nav-open');
-    }
-
-
-    // --- Lógica do Carrossel Principal ---
-    const carouselSection = document.querySelector('.carousel-section-lateral');
-    if (carouselSection) {
-        let currentIndex = 0;
-        const carouselImagesContainer = carouselSection.querySelector('.carousel-images');
-        const images = carouselImagesContainer.querySelectorAll('img');
-        const totalImages = images.length;
-        let slideWidth = carouselImagesContainer.clientWidth;
-
-        function updateSlideWidth() {
-            slideWidth = carouselImagesContainer.clientWidth;
-            goToSlide(currentIndex);
-        }
-
-        window.moveCarousel = function(direction) {
-            currentIndex += direction;
-            if (currentIndex < 0) {
-                currentIndex = totalImages - 1;
-            } else if (currentIndex >= totalImages) {
-                currentIndex = 0;
-            }
-            goToSlide(currentIndex);
-        }
-
-        window.goToSlide = function(index) {
-            currentIndex = index;
-            const offset = -currentIndex * slideWidth;
-            carouselImagesContainer.style.transform = `translateX(${offset}px)`;
-            updateIndicators();
-        }
-
-        function updateIndicators() {
-            carouselSection.querySelectorAll('.carousel-indicators .indicator').forEach((indicator, i) => {
-                indicator.classList.toggle('active', i === currentIndex);
-            });
-        }
-        window.addEventListener('resize', updateSlideWidth);
-        goToSlide(0);
-    }
-
-    // --- Lógica do Carrossel de Parceiros ---
-    const partnerCarousel = document.querySelector('.clients__carousel-content');
-    if (partnerCarousel) {
-        const prevBtn = document.querySelector('.clients-carousel-btn.prev');
-        const nextBtn = document.querySelector('.clients-carousel-btn.next');
-        const partnerItems = partnerCarousel.querySelectorAll('.client-item');
-        if (partnerItems.length > 0) {
-            const itemWidth = partnerItems[0].offsetWidth + 40;
-            let currentPartnerIndex = 0;
-
-            function updatePartnerCarouselPosition() {
-                partnerCarousel.style.transform = `translateX(${-currentPartnerIndex * itemWidth}px)`;
-            }
-
-            nextBtn.addEventListener('click', () => {
-                const itemsInView = Math.floor(partnerCarousel.parentElement.offsetWidth / itemWidth);
-                const maxIndex = partnerItems.length - itemsInView;
-                if (currentPartnerIndex < maxIndex) {
-                    currentPartnerIndex++;
-                    updatePartnerCarouselPosition();
-                }
-            });
-
-            prevBtn.addEventListener('click', () => {
-                if (currentPartnerIndex > 0) {
-                    currentPartnerIndex--;
-                    updatePartnerCarouselPosition();
-                }
-            });
-            
-            partnerItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const name = item.dataset.name;
-                    const info = item.dataset.info;
-                    const imgSrc = item.querySelector('img').src;
-                    showPartnerInfo(name, info, imgSrc);
-                });
-            });
-        }
-    }
-
-    // --- Lógica dos Modais (Visualizadores de Imagem e Atleta) ---
-    const imageViewer = document.getElementById('image-viewer');
-    const athleteViewer = document.getElementById('athlete-viewer');
-
-    function showPartnerInfo(name, info, imgSrc) {
-        const viewerTitle = document.getElementById('viewer-title');
-        const viewerImg = document.getElementById('viewer-img');
-        const viewerText = document.getElementById('viewer-text');
-
-        viewerTitle.style.display = 'block';
-        viewerImg.style.display = 'block';
-        viewerText.style.display = 'block';
-
-        viewerTitle.textContent = name;
-        viewerImg.src = imgSrc;
-        viewerText.textContent = info;
-        
-        if (imageViewer) imageViewer.style.display = 'flex';
-    }
-
-    window.showImage = function(src) {
-        const viewerTitle = document.getElementById('viewer-title');
-        const viewerImg = document.getElementById('viewer-img');
-        const viewerText = document.getElementById('viewer-text');
-
-        viewerTitle.style.display = 'none';
-        viewerImg.style.display = 'block';
-        viewerText.style.display = 'none';
-
-        viewerImg.src = src;
-
-        if (imageViewer) imageViewer.style.display = 'flex';
-    }
-    
-    window.closeImage = function() {
-        if (imageViewer) {
-            imageViewer.style.display = 'none';
-            document.getElementById('viewer-title').textContent = '';
-            document.getElementById('viewer-img').src = '';
-            document.getElementById('viewer-text').textContent = '';
-        }
-    }
-
-    if (imageViewer) {
-        imageViewer.addEventListener('click', (event) => {
-            if (event.target === imageViewer) closeImage();
-        });
-    }
-    
-    function showAthleteModal(data) {
-        document.getElementById('athlete-modal-photo').src = data.photo;
-        document.getElementById('athlete-modal-name').innerText = data.name;
-        document.getElementById('athlete-modal-role').innerText = data.role;
-        document.getElementById('athlete-modal-age').innerHTML = `<strong>Idade:</strong> ${data.age}`;
-        document.getElementById('athlete-modal-foot').innerHTML = `<strong>Pé Dominante:</strong> ${data.foot}`;
-        document.getElementById('athlete-modal-club').innerHTML = `<strong>Clube Atual:</strong> ${data.club}`;
-        document.getElementById('athlete-modal-bio').innerText = data.bio;
-        
-        const videoWrapper = document.getElementById('athlete-modal-video-wrapper');
-        videoWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${data.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-        
-        const statsContainer = document.getElementById('athlete-modal-stats');
-        statsContainer.innerHTML = '';
-
-        if (data.stats) {
-            try {
-                const stats = JSON.parse(data.stats);
-                if (stats.stats) {
-                    for (const [statName, statValue] of Object.entries(stats.stats)) {
-                        const statEl = document.createElement('div');
-                        statEl.className = 'stat-item-modal';
-
-                        const nameEl = document.createElement('span');
-                        nameEl.className = 'stat-item-modal__name';
-                        nameEl.textContent = statName;
-
-                        const valueEl = document.createElement('span');
-                        valueEl.className = `stat-item-modal__value rating-${statValue.toLowerCase()}`;
-                        valueEl.textContent = statValue;
-
-                        statEl.appendChild(nameEl);
-                        statEl.appendChild(valueEl);
-                        statsContainer.appendChild(statEl);
-                    }
-                }
-            } catch (e) {
-                console.error("Erro ao analisar o JSON de estatísticas do atleta:", e);
-                statsContainer.innerHTML = '<p>Estatísticas indisponíveis.</p>';
-            }
-        }
-        
-        const physicalContainer = document.getElementById('athlete-modal-physical');
-        physicalContainer.innerHTML = '';
-
-        if (data.physical) {
-            try {
-                const physicalStats = JSON.parse(data.physical);
-                for (const [statName, statValue] of Object.entries(physicalStats)) {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'physical-stat-item';
-                    const labelEl = document.createElement('div');
-                    labelEl.className = 'physical-stat-label';
-                    labelEl.textContent = statName;
-                    const barContainerEl = document.createElement('div');
-                    barContainerEl.className = 'physical-stat-bar-container';
-                    const barEl = document.createElement('div');
-                    barEl.className = 'physical-stat-bar';
-                    setTimeout(() => {
-                        barEl.style.width = `${statValue}%`;
-                    }, 50);
-                    barEl.textContent = statValue;
-                    barContainerEl.appendChild(barEl);
-                    itemEl.appendChild(labelEl);
-                    itemEl.appendChild(barContainerEl);
-                    physicalContainer.appendChild(itemEl);
-                }
-            } catch (e) {
-                console.error("Erro ao analisar o JSON de atributos físicos:", e);
-                physicalContainer.innerHTML = '<p>Atributos físicos indisponíveis.</p>';
-            }
-        }
-
-        if(athleteViewer) athleteViewer.style.display = 'flex';
-    }
-
-    window.closeAthlete = function() {
-        const videoWrapper = document.getElementById('athlete-modal-video-wrapper');
-        if (videoWrapper) videoWrapper.innerHTML = ''; 
-        if (athleteViewer) athleteViewer.style.display = 'none';
-    }
-
-    if (athleteViewer) {
-        athleteViewer.addEventListener('click', (event) => {
-            if (event.target === athleteViewer) closeAthlete();
-        });
-    }
-
-    document.querySelectorAll('.athlete-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const athleteData = {
-                photo: card.dataset.photo,
-                name: card.dataset.name,
-                role: card.dataset.role,
-                age: card.dataset.age,
-                foot: card.dataset.foot,
-                club: card.dataset.club,
-                bio: card.dataset.bio,
-                videoId: card.dataset.videoId,
-                stats: card.dataset.stats,
-                physical: card.dataset.physical
-            };
-            showAthleteModal(athleteData);
-        });
+// Função para mostrar abas
+function showTab(tabName) {
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => {
+        content.classList.remove('active');
     });
+    document.getElementById(tabName).classList.add('active');
+    window.scrollTo(0, 0);
+}
 
-    // --- Lógica do Acordeão (FAQ/Expertise) ---
-    window.toggleAccordion = function(button) {
-        const content = button.nextElementSibling;
-        button.classList.toggle('active');
+// Menu mobile
+const menuToggle = document.querySelector('.header__menu-toggle');
+const body = document.body;
 
-        if (content.style.maxHeight && content.style.maxHeight !== "0px") {
-            content.style.maxHeight = "0px";
-        } else {
-            content.style.maxHeight = content.scrollHeight + "px";
-        }
-    }
-    
-    document.querySelectorAll('.accordion-content').forEach(content => {
-        content.style.maxHeight = "0px";
-    });
+menuToggle.addEventListener('click', () => {
+    body.classList.toggle('nav-open');
+});
 
-    // --- LÓGICA: CONTADOR DE LOGROS/ACHIEVEMENTS ---
+function closeMobileMenu() {
+    body.classList.remove('nav-open');
+}
+
+// Animação de números (Nossos Logros)
+document.addEventListener("DOMContentLoaded", function() {
     const achievementsSection = document.querySelector('.achievements');
-    let hasAnimated = false;
 
-    const animateCounters = (entries, observer) => {
+    const animateNumbers = (entries, observer) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting && !hasAnimated) {
-                const counters = document.querySelectorAll('.achievement__number');
-                counters.forEach(counter => {
-                    counter.innerText = '0';
-                    const target = +counter.getAttribute('data-target');
-                    const duration = 2000;
-                    let start = 0;
-                    const increment = target / (duration / 16); 
+            if (entry.isIntersecting) {
+                const achievementNumbers = document.querySelectorAll('.achievement__number');
+                achievementNumbers.forEach(numElement => {
+                    const target = +numElement.getAttribute('data-target');
+                    numElement.innerText = '0';
+                    const duration = 2000; // 2 segundos
+                    const stepTime = 10; // ms
+                    const totalSteps = duration / stepTime;
+                    const increment = target / totalSteps;
 
-                    const updateCounter = () => {
-                        start += increment;
-                        if (start < target) {
-                            counter.innerText = Math.ceil(start).toLocaleString('pt-BR');
-                            requestAnimationFrame(updateCounter);
+                    const updateCount = () => {
+                        const c = +numElement.innerText;
+                        if (c < target) {
+                            numElement.innerText = `${Math.ceil(c + increment)}`;
+                            setTimeout(updateCount, stepTime);
                         } else {
-                            counter.innerText = target.toLocaleString('pt-BR');
+                            numElement.innerText = target;
                         }
                     };
-                    updateCounter();
+                    updateCount();
                 });
-                hasAnimated = true; 
                 observer.unobserve(achievementsSection);
             }
         });
     };
-    
-    const observer = new IntersectionObserver(animateCounters, {
-        threshold: 0.5
+
+    const observer = new IntersectionObserver(animateNumbers, {
+        threshold: 0.1
     });
 
     if (achievementsSection) {
         observer.observe(achievementsSection);
     }
+});
+
+
+// Carousel da Home
+let currentIndex = 0;
+const carouselImages = document.querySelector('.carousel-images');
+if (carouselImages) {
+    const totalImages = document.querySelectorAll('.carousel-images img').length;
+    const indicators = document.querySelectorAll('.indicator');
+
+    function updateCarousel() {
+        if (!document.querySelector('.carousel')) return;
+        const width = document.querySelector('.carousel').clientWidth;
+        carouselImages.style.transform = `translateX(${-currentIndex * width}px)`;
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === currentIndex);
+        });
+    }
+
+    function moveCarousel(n) {
+        currentIndex = (currentIndex + n + totalImages) % totalImages;
+        updateCarousel();
+    }
+
+    function goToSlide(n) {
+        currentIndex = n;
+        updateCarousel();
+    }
+    
+    // Auto-avanço do carousel
+    setInterval(() => {
+        moveCarousel(1);
+    }, 5000); // Muda a cada 5 segundos
+}
+
+
+// Accordion (FAQ e Expertise)
+function toggleAccordion(element) {
+    const content = element.nextElementSibling;
+    element.classList.toggle('active');
+
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+        content.style.paddingTop = null;
+        content.style.paddingBottom = null;
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.style.paddingTop = '15px';
+        content.style.paddingBottom = '15px';
+    }
+}
+
+// Image Viewer (modal de imagem)
+const imageViewer = document.getElementById('image-viewer');
+const viewerImg = document.getElementById('viewer-img');
+const viewerTitle = document.getElementById('viewer-title');
+const viewerText = document.getElementById('viewer-text');
+const clientItems = document.querySelectorAll('.client-item');
+
+function showImage(src) {
+    if(viewerImg) viewerImg.src = src;
+    if(imageViewer) imageViewer.style.display = 'flex';
+    if(viewerTitle) viewerTitle.style.display = 'none';
+    if(viewerText) viewerText.style.display = 'none';
+}
+
+clientItems.forEach(item => {
+    item.addEventListener('click', () => {
+        viewerImg.src = item.querySelector('img').src;
+        viewerTitle.textContent = item.dataset.name;
+        viewerText.textContent = item.dataset.info;
+
+        viewerTitle.style.display = 'block';
+        viewerText.style.display = 'block';
+        imageViewer.style.display = 'flex';
+    });
+});
+
+function closeImage() {
+    if(imageViewer) imageViewer.style.display = 'none';
+}
+
+// Athlete Viewer (Modal do Atleta)
+const athleteViewer = document.getElementById('athlete-viewer');
+const athleteCards = document.querySelectorAll('.athlete-card');
+
+const ratingColors = {
+    'SS': 'linear-gradient(145deg, #ffdf70, #ffb347)',
+    'S': 'linear-gradient(145deg, #e8e8e8, #b0b0b0)',
+    'A': 'linear-gradient(145deg, #d88f42, #a0522d)',
+    'B': 'linear-gradient(145deg, #5a9fe2, #357abd)',
+    'C': 'linear-gradient(145deg, #60e3d2, #20c997)',
+    'D': 'linear-gradient(145deg, #c4c4c4, #8d8d8d)'
+};
+
+athleteCards.forEach(card => {
+    card.addEventListener('click', () => {
+        if (!athleteViewer) return;
+        const data = card.dataset;
+        const stats = JSON.parse(data.stats);
+        const physical = JSON.parse(data.physical);
+
+        document.getElementById('athlete-modal-photo').src = data.photo;
+        document.getElementById('athlete-modal-name').textContent = data.name;
+        document.getElementById('athlete-modal-role').textContent = data.role;
+        document.getElementById('athlete-modal-age').innerHTML = `<strong>Idade:</strong> ${data.age}`;
+        document.getElementById('athlete-modal-foot').innerHTML = `<strong>Pé Dominante:</strong> ${data.foot}`;
+        document.getElementById('athlete-modal-club').innerHTML = `<strong>Clube:</strong> ${data.club}`;
+        document.getElementById('athlete-modal-bio').textContent = data.bio;
+
+        const statsContainer = document.getElementById('athlete-modal-stats');
+        statsContainer.innerHTML = '';
+        for (const [key, value] of Object.entries(stats.stats)) {
+            const statItem = document.createElement('div');
+            statItem.className = 'stat-item-modal';
+            statItem.innerHTML = `<span class="stat-item-modal__name">${key}</span><span class="stat-item-modal__value" style="background: ${ratingColors[value] || '#555'}">${value}</span>`;
+            statsContainer.appendChild(statItem);
+        }
+
+        const physicalContainer = document.getElementById('athlete-modal-physical');
+        physicalContainer.innerHTML = '';
+        for (const [key, value] of Object.entries(physical)) {
+            const physicalItem = document.createElement('div');
+            physicalItem.className = 'physical-stat-item';
+            physicalItem.innerHTML = `
+                <span class="physical-stat-label">${key}</span>
+                <div class="physical-stat-bar-container">
+                    <div class="physical-stat-bar" data-value="${value}">${value}</div>
+                </div>`;
+            physicalContainer.appendChild(physicalItem);
+             
+            setTimeout(() => {
+                const bar = physicalItem.querySelector('.physical-stat-bar');
+                bar.style.width = `${bar.dataset.value}%`;
+            }, 100);
+        }
+
+        const videoWrapper = document.getElementById('athlete-modal-video-wrapper');
+        videoWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${data.videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+
+        athleteViewer.style.display = 'flex';
+    });
+});
+
+function closeAthlete() {
+    if (!athleteViewer) return;
+    const videoWrapper = document.getElementById('athlete-modal-video-wrapper');
+    if (videoWrapper) {
+        videoWrapper.innerHTML = ''; // Para o vídeo ao fechar
+    }
+    athleteViewer.style.display = 'none';
+}
+
+
+// Carousel de Clientes
+const clientsCarousel = document.querySelector('.clients__carousel-content');
+if (clientsCarousel && clientsCarousel.children.length > 0) {
+    const allClientItems = Array.from(clientsCarousel.children);
+    
+    // Duplicar os itens para o efeito de carrossel infinito se houver itens suficientes
+    if (allClientItems.length > 0) {
+        allClientItems.forEach(item => {
+            const clone = item.cloneNode(true);
+            clientsCarousel.appendChild(clone);
+        });
+    }
+
+    const nextBtn = document.querySelector('.clients-carousel-btn.next');
+    const prevBtn = document.querySelector('.clients-carousel-btn.prev');
+    let clientCarouselIndex = 0;
+    
+    if (nextBtn && prevBtn && allClientItems.length > 0) {
+        const clientItemWidth = allClientItems[0].offsetWidth + 40; // Largura + margem
+        const itemsToScroll = 1; 
+        const maxIndex = allClientItems.length;
+
+        nextBtn.addEventListener('click', () => {
+            clientCarouselIndex += itemsToScroll;
+            if (clientCarouselIndex >= maxIndex) {
+                 clientCarouselIndex = 0;
+                 clientsCarousel.style.transition = 'none';
+                 clientsCarousel.style.transform = `translateX(0px)`;
+                 setTimeout(() => {
+                    clientsCarousel.style.transition = 'transform 0.5s ease';
+                 }, 50);
+            }
+            clientsCarousel.style.transform = `translateX(-${clientCarouselIndex * clientItemWidth}px)`;
+        });
+
+        prevBtn.addEventListener('click', () => {
+            clientCarouselIndex -= itemsToScroll;
+            if (clientCarouselIndex < 0) {
+                clientCarouselIndex = maxIndex -1;
+                clientsCarousel.style.transition = 'none';
+                clientsCarousel.style.transform = `translateX(-${clientCarouselIndex * clientItemWidth}px)`;
+                setTimeout(() => {
+                    clientsCarousel.style.transition = 'transform 0.5s ease';
+                 }, 50);
+            }
+            clientsCarousel.style.transform = `translateX(-${clientCarouselIndex * clientItemWidth}px)`;
+        });
+    }
+}
+
+
+// Ativar aba Home por padrão e outras inicializações
+document.addEventListener('DOMContentLoaded', () => {
+    showTab('home');
+
+    // Inicializa o carrossel da home se existir
+    if (document.querySelector('.carousel-images')) {
+       updateCarousel();
+    }
+
+    // Colore os segmentos do gráfico de pizza
+    document.querySelectorAll('.donut-segment').forEach(segment => {
+       const color = segment.dataset.color;
+       if (color) {
+           segment.style.stroke = color;
+       }
+    });
 });
