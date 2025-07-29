@@ -440,6 +440,25 @@ body.nav-open .header__menu-toggle .fa-times {
     text-align: center;
     color: #f5f0f0
 }
+
+.footer .sponsors {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.footer .sponsor-logo img {
+    height: 60px;
+    filter: grayscale(100%) brightness(1.5);
+    transition: filter 0.3s;
+}
+
+.footer .sponsor-logo:hover img {
+    filter: none;
+}
+
 .footer__social {
     list-style: none;
     display: flex;
@@ -469,7 +488,14 @@ body.nav-open .header__menu-toggle .fa-times {
 .tab-content {
     display: none;
     padding-top: 80px; 
+    animation: fadeIn 0.5s;
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 .tab-content.active {
     display: block;
 }
